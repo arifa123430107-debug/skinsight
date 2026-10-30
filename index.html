@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SkinSight | Analisis Kondisi Kulit Wajah</title>
+<link rel="icon" type="image/png" href="assets/logo.png">
 <meta name="description" content="SkinSight: aplikasi desktop untuk analisis kondisi kulit wajah berbasis ensemble deep learning.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
-<!-- Cari teks "ISI" (Ctrl+F) untuk menemukan semua bagian yang perlu kamu isi sendiri. -->
 <style>
 :root{--ink:#3a1d2a;--mute:#7d5a68;--rose:#c9184a;--rose-d:#a4133c;--blush:#ffd6e0;--petal:#fff5f7;--line:#f2c9d4;--white:#fff;--r:14px}
 *{box-sizing:border-box}
@@ -23,7 +23,7 @@ a{color:var(--rose-d)}
 :focus-visible{outline:3px solid var(--rose);outline-offset:2px}
 .wrap{max-width:980px;margin:0 auto;padding:0 20px}
 section{padding:64px 0;border-top:1px solid var(--line)}
-section>.wrap>p.lead{max-width:62ch;color:var(--mute)}
+section>.wrap>p.lead{color:var(--mute);text-align:justify}
 nav{position:sticky;top:0;z-index:20;background:rgba(255,245,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;gap:6px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}
 nav b{font-family:Fraunces,serif;color:var(--rose);margin-right:10px;white-space:nowrap;align-self:center}
@@ -36,9 +36,9 @@ nav a:hover{background:var(--blush)}
 .btn{display:inline-block;background:var(--rose);color:#fff;text-decoration:none;font-weight:700;padding:12px 24px;border-radius:99px;margin:0 8px 8px 0}
 .btn:hover{background:var(--rose-d)}
 .btn.alt{background:transparent;color:var(--rose-d);border:2px solid var(--rose)}
-.shot{aspect-ratio:4/3;background:var(--white);border:2px dashed var(--line);border-radius:var(--r);display:grid;place-items:center;text-align:center;color:var(--mute);padding:16px;overflow:hidden}
-.shot img,.shot video{width:100%;height:100%;object-fit:cover;border-radius:10px}
-.isi{background:#fff0b8;color:#5b4700;padding:0 6px;border-radius:4px;font-size:.92em}
+.shot{background:var(--white);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.shot img{display:block;width:100%;height:auto}
+.isi{}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:24px}
 .card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px}
 .card p{margin:0;color:var(--mute);font-size:.95rem}
@@ -77,18 +77,25 @@ footer{padding:32px 0;text-align:center;color:var(--mute);border-top:1px solid v
 .selesai .st{background:var(--rose-d);color:#fff}
 .berjalan .st{background:var(--blush);color:var(--rose-d)}
 .rencana .st{background:var(--white);color:var(--mute);border:1px dashed var(--mute)}
+.catatan{color:var(--mute);margin-top:16px;text-align:justify;text-justify:inter-word;hyphens:auto}
+nav b{display:inline-flex;align-items:center;gap:8px}
+nav b img{height:30px;width:auto}
+.logo-hero{height:64px;width:auto;margin-bottom:16px}
+.video{aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#000}
+.video iframe{width:100%;height:100%;border:0}
 @media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:40px}}
 </style>
 </head>
 <body>
 
 <nav aria-label="Navigasi utama"><div class="wrap">
-<b>SkinSight</b>
+<b><img src="assets/logo.png" alt="Logo SkinSight">SkinSight</b>
 <a href="#tim">Tim</a><a href="#jadwal">Jadwal</a><a href="#fitur">Fitur</a><a href="#arsitektur">Arsitektur</a><a href="#evaluasi">Evaluasi</a><a href="#stack">Komponen</a><a href="#pakai">Alur penggunaan</a><a href="#masalah">Troubleshooting</a><a href="#visual">Dokumentasi</a><a href="#repo">Struktur repo</a>
 </div></nav>
 
 <header class="wrap hero">
 <div>
+<img class="logo-hero" src="assets/logo.png" alt="Logo SkinSight">
 <h1>SkinSight</h1>
 <p>Aplikasi desktop Windows yang membaca kondisi kulit wajah dari kamera, menampilkan hasilnya dalam hitungan detik, dan menyimpan riwayat perubahannya. <span class="isi"> </span></p>
 <div class="badges">
@@ -96,12 +103,12 @@ footer{padding:32px 0;text-align:center;color:var(--mute);border-top:1px solid v
 </div>
 <a class="btn" href="#fitur">Lihat fitur</a><a class="btn alt" href="#visual">Lihat dokumentasi</a>
 </div>
-<div class="shot"><span class="isi">ISI: taruh screenshot dashboard di assets/dashboard.png, lalu ganti bagian ini dengan &lt;img src="assets/dashboard.png" alt="Dashboard SkinSight"&gt;</span></div>
+<div class="shot"><img src="assets/dashboard.png" alt="Dashboard SkinSight"></div>
 </header>
 
 <section id="tim"><div class="wrap team">
 <h2>Tim pengembang</h2>
-<p class="lead">Program Studi Teknik Biomedis, Institut Teknologi Sumatera. <span class="isi">Mata Kuliah: Pengembangan Sistem Biomedis</span></p>
+<p class="lead">Program Studi Teknik Biomedis, Institut Teknologi Sumatera. <span class="isi">Mata Kuliah Pengembangan Sistem Biomedis. Dosen Pembimbing Rudi Setiawan, S.T., M.T.</span></p>
 <div class="grid">
 <div class="card"><b><span class="isi">Intan Endarwati</span></b><p><span class="isi">123430094</span></p></div>
 <div class="card"><b><span class="isi">Jihan Nailah Efrani</span></b><p><span class="isi">123430005</span></p></div>
@@ -117,10 +124,10 @@ footer{padding:32px 0;text-align:center;color:var(--mute);border-top:1px solid v
 
 <section id="fitur"><div class="wrap">
 <h2>Apa yang bisa dilakukan SkinSight</h2>
-<p class="lead">Pengguna cukup menghadap kamera. Hasil analisis, estimasi detak jantung, dan laporan dibuat dalam satu alur. <span class="isi">Perkembangan teknologi kesehatan digital memungkinkan deteksi awal kondisi kulit wajah secara praktis dan non-invasif melalui pemanfaatan teknologi computer vision. Aplikasi ini dirancang untuk menganalisis kondisi kulit wajah secara real-time menggunakan kamera laptop melalui pengolahan citra digital untuk mengidentifikasi berbagai permasalahan kulit, seperti jerawat, iritasi, dan perubahan karakteristik kulit lainnya. Melalui sistem ini, pengguna diharapkan dapat memperoleh informasi awal mengenai kondisi kulit wajah sebagai dasar dalam menentukan perawatan kulit yang sesuai.</span></p>
+<p class="lead">Pengguna cukup menghadap kamera. Hasil analisis, rPPG, dan laporan dibuat dalam satu alur. <span class="isi">Perkembangan teknologi kesehatan digital memungkinkan deteksi awal kondisi kulit wajah secara praktis dan non-invasif melalui pemanfaatan teknologi computer vision. Aplikasi ini dirancang untuk menganalisis kondisi kulit wajah secara real-time menggunakan kamera laptop melalui pengolahan citra digital untuk mengidentifikasi berbagai permasalahan kulit, seperti jerawat, iritasi, dan perubahan karakteristik kulit lainnya. Melalui sistem ini, pengguna diharapkan dapat memperoleh informasi awal mengenai kondisi kulit wajah sebagai dasar dalam menentukan perawatan kulit yang sesuai.</span></p>
 <div class="grid">
 <div class="card"><h3>Analisis 9 kondisi kulit</h3><p>Jerawat, kulit berminyak, flek hitam, kemerahan, kulit kering, kerutan, komedo, mata panda, dan kulit normal.</p></div>
-<div class="card"><h3>Estimasi detak jantung</h3><p>Dihitung dari perubahan warna kulit pada kanal hijau kamera RGB biasa, tanpa sensor tambahan.</p></div>
+<div class="card"><h3>Sensor rPPG</h3><p>Dihitung dari perubahan warna kulit pada kanal hijau kamera RGB biasa, tanpa sensor tambahan.</p></div>
 <div class="card"><h3>Laporan PDF dan email</h3><p>Hasil analisis disusun menjadi laporan PDF dan dapat dikirim langsung lewat email.</p></div>
 <div class="card"><h3>Profil dan tren</h3><p>Setiap pengguna punya profil. Halaman tren menampilkan perubahan kondisi kulit dari waktu ke waktu.</p></div>
 </div>
@@ -137,7 +144,7 @@ graph LR
   C --> E[Penggabungan prediksi]
   D --> E
   A --> F[Sinyal kanal hijau]
-  F --> G[Estimasi detak jantung]
+  F --> G[Sensor rPPG]
   E --> H[Hasil analisis]
   G --> H
   H --> I[Laporan PDF]
@@ -165,7 +172,7 @@ graph LR
 <tr><td>Mata panda</td><td>0,931</td><td>0,900</td><td><span class="bar" style="width:91px"></span>0,915</td></tr>
 <tr><td>Normal</td><td>0,667</td><td>0,667</td><td><span class="bar" style="width:67px"></span>0,667</td></tr>
 </tbody></table></div>
-<p><span class="isi">Kelas berminyak dan normal paling sulit dibedakan karena efek pencahayaan yang serupa pada citra.</span></p>
+<p><span class="catatan">Kelas berminyak dan normal masih menunjukkan tingkat kesalahan klasifikasi yang relatif tinggi akibat kemiripan karakteristik visual dan pengaruh pencahayaan, sehingga diperlukan optimalisasi preprocessing dan penambahan variasi data untuk meningkatkan akurasi klasifikasi.</span></p>
 </div></section>
 
 <section id="stack"><div class="wrap">
@@ -178,7 +185,7 @@ graph LR
 <tr><td>Model</td><td>Keras dan Teachable Machine, dikonversi ke TFLite</td><td>Klasifikasi kondisi kulit</td></tr>
 <tr><td>Visualisasi</td><td>Matplotlib</td><td>Grafik tren</td></tr>
 <tr><td>Distribusi</td><td>PyInstaller (onedir)</td><td>Paket .exe untuk Windows</td></tr>
-<tr><td>Lainnya</td><td><span class="isi">OpenCV, ReportLab, </span></td><td><span class="isi">ISI</span></td></tr>
+<tr><td>Lainnya</td><td><span class="isi">OpenCV, ReportLab, SQLite</span></td><td><span class="isi">Pemrosesan citra, pembuatan laporan PDF, dan penyimpanan riwayat analisis</span></td></tr>
 </tbody></table></div>
 </div></section>
 
@@ -188,7 +195,7 @@ graph LR
 <ol class="steps">
 <li>Pengguna membuat profil di halaman Pengaturan.</li>
 <li>Di halaman Capture, pengguna menghadap kamera dengan cahaya cukup, lalu memulai analisis.</li>
-<li>Hasil analisis dan estimasi detak jantung tampil di halaman Analisis.</li>
+<li>Hasil analisis dan tampil di halaman Analisis.</li>
 <li>Hasil disimpan sebagai laporan PDF atau dikirim lewat email.</li>
 <li>Perubahan kondisi kulit dari waktu ke waktu dapat dilihat di halaman Tren.</li>
 </ol>
@@ -200,21 +207,29 @@ graph LR
 <div><p><b>Penyebab:</b> TensorFlow versi penuh memerlukan instruksi AVX pada CPU, dan sebagian komputer tidak memilikinya.</p>
 <p><b>Solusi:</b> model dikonversi ke TFLite, build dibuat dengan mode onedir, dan modul berat dimuat saat dibutuhkan.</p></div></details>
 <details><summary>Kamera tidak terdeteksi</summary>
-<div><p><span class="isi">ISI: penyebab dan solusi</span></p></div></details>
+<div><p><span class="isi">Penyebab: Kamera tidak terhubung atau tidak didukung oleh sistem.</span></p>
+<p><span class="isi">Solusi: Pastikan kamera terhubung dengan benar dan kompatibel dengan sistem operasi.</span></p></div></details>
 <details><summary>Email gagal terkirim</summary>
-<div><p><span class="isi">ISI: penyebab dan solusi, misalnya koneksi atau sandi aplikasi Gmail</span></p></div></details>
+<div><p><span class="isi">Penyebab: Masalah koneksi internet atau sandi aplikasi Gmail yang salah.</span></p>
+<p><span class="isi">Solusi: Periksa koneksi internet dan pastikan sandi aplikasi Gmail Anda benar.</span></p></div></details>
 </div></section>
 
 <section id="visual"><div class="wrap">
 <h2>Dokumentasi visual</h2>
 <div class="gallery">
-<figure><div class="shot"><span class="isi">ISI: assets/capture.png</span></div><figcaption>Gambar 1. Halaman Capture. <span class="isi">ISI</span></figcaption></figure>
-<figure><div class="shot"><span class="isi">ISI: assets/analisis.png</span></div><figcaption>Gambar 2. Halaman Analisis. <span class="isi">ISI</span></figcaption></figure>
-<figure><div class="shot"><span class="isi">ISI: assets/tren.png</span></div><figcaption>Gambar 3. Halaman Tren. <span class="isi">ISI</span></figcaption></figure>
+<figure><div class="shot"><img src="assets/capture.png" alt="Halaman Capture"></div><figcaption>Gambar 1. Halaman Capture: pengambilan citra wajah lewat kamera.</figcaption></figure>
+<figure><div class="shot"><img src="assets/analisis.png" alt="Halaman Analisis"></div><figcaption>Gambar 2. Halaman Analisis: hasil klasifikasi kondisi kulit.</figcaption></figure>
+<figure><div class="shot"><img src="assets/email.png" alt="Halaman Kirim Email"></div><figcaption>Gambar 3. Halaman Kirim Email: pengiriman laporan melalui email.</figcaption></figure>
 </div>
-<h3 style="margin-top:32px">Video demonstrasi</h3>
-<div class="shot" style="aspect-ratio:16/9"><span class="isi">ISI: tempel embed YouTube di sini, atau pakai &lt;video controls src="assets/demo.mp4"&gt;</span></div>
-</div></section>
+<h3 style="margin-top:32px">Video <div class="video">
+  <iframe src="https://www.youtube.com/embed/4C5g5kgIGCA?si=j25qIgTJrVGdM6TK"
+    title="Video demonstrasi SkinSight"
+    loading="lazy"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen></iframe>
+</div>
+
 
 <section id="repo"><div class="wrap">
 <h2>Struktur repositori</h2>
@@ -231,15 +246,15 @@ graph LR
 <div class="table-wrap"><table>
 <thead><tr><th>Folder</th><th>Isi</th></tr></thead>
 <tbody>
-<tr><td>docs</td><td><span class="isi">ISI: daftar dokumen</span></td></tr>
+<tr><td>docs</td><td><span class="isi">7 dokumen pendukung, meliputi BMSeries dan informasi teknis aplikasi</span></td></tr>
 <tr><td>data</td><td>Deskripsi 9 kategori, jumlah gambar, tabel evaluasi</td></tr>
-<tr><td>src</td><td><span class="isi">ISI: file kode yang disertakan</span></td></tr>
+<tr><td>src</td><td><span class="isi">3 file python mencakup training model, evaluasi, dan deployment</span></td></tr>
 <tr><td>design</td><td>Mockup UI dan diagram arsitektur</td></tr>
 <tr><td>procedures</td><td>Prosedur pengembangan dan pengujian real-time</td></tr>
 </tbody></table></div>
 </div></section>
 
-<footer>© 2026 SkinSight, Teknik Biomedis ITERA. <span class="isi">ISI: nama mata kuliah</span></footer>
+<footer>© 2026 SkinSight, Teknik Biomedis ITERA. <span class="isi">Mata Kuliah Pengembangan Sistem Biomedis</span></footer>
 
 <script>
 /* ===== EDIT JADWAL DI SINI =====
@@ -249,7 +264,7 @@ const JADWAL=[
  {periode:"Maret 2026",judul:"Perancangan konsep dan studi literatur",desc:"Menentukan masalah, fitur utama, dan pendekatan analisis kulit.",status:"selesai"},
  {periode:"Maret 2026",judul:"Pengumpulan dataset",desc:"15.500 gambar dalam 9 kategori kondisi kulit.",status:"selesai"},
  {periode:"April 2026",judul:"Pelatihan dan evaluasi model",desc:"Model Keras kustom dan Teachable Machine, diuji pada 270 sampel.",status:"selesai"},
- {periode:"April 2026",judul:"Pengembangan aplikasi PyQt5",desc:"Analisis, estimasi detak jantung, laporan PDF, email, profil, dan tren.",status:"selesai"},
+ {periode:"April 2026",judul:"Pengembangan aplikasi PyQt5",desc:"Analisis, rPPG, laporan PDF, email, profil, dan tren.",status:"selesai"},
  {periode:"Mei 2026",judul:"Redesign antarmuka",desc:"Dashboard, Capture, Analisis, Tren, dan Pengaturan.",status:"selesai"},
  {periode:"Juni 2026",judul:"Optimasi distribusi",desc:"Konversi TFLite dan build onedir agar berjalan di lebih banyak komputer.",status:"selesai"},
  {periode:"Juni 2026",judul:"Pengujian real-time",desc:"Lebih dari 300 kali pengujian langsung.",status:"selesai"},
