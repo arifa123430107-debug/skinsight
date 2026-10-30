@@ -84,7 +84,7 @@ footer{padding:32px 0;text-align:center;color:var(--mute);border-top:1px solid v
 
 <nav aria-label="Navigasi utama"><div class="wrap">
 <b>SkinSight</b>
-<a href="#tim">Tim</a><a href="#jadwal">Jadwal</a><a href="#fitur">Fitur</a><a href="#arsitektur">Arsitektur</a><a href="#evaluasi">Evaluasi</a><a href="#stack">Komponen</a><a href="#pakai">Cara pakai</a><a href="#masalah">Troubleshooting</a><a href="#visual">Dokumentasi</a><a href="#repo">Struktur repo</a>
+<a href="#tim">Tim</a><a href="#jadwal">Jadwal</a><a href="#fitur">Fitur</a><a href="#arsitektur">Arsitektur</a><a href="#evaluasi">Evaluasi</a><a href="#stack">Komponen</a><a href="#pakai">Alur penggunaan</a><a href="#masalah">Troubleshooting</a><a href="#visual">Dokumentasi</a><a href="#repo">Struktur repo</a>
 </div></nav>
 
 <header class="wrap hero">
@@ -94,7 +94,7 @@ footer{padding:32px 0;text-align:center;color:var(--mute);border-top:1px solid v
 <div class="badges">
 <span class="badge">Python</span><span class="badge">PyQt5</span><span class="badge">TensorFlow Lite</span><span class="badge">Ensemble Deep Learning</span><span class="badge">rPPG</span>
 </div>
-<a class="btn" href="#pakai">Unduh aplikasi</a><a class="btn alt" href="#fitur">Lihat fitur</a>
+<a class="btn" href="#fitur">Lihat fitur</a><a class="btn alt" href="#visual">Lihat dokumentasi</a>
 </div>
 <div class="shot"><span class="isi">ISI: taruh screenshot dashboard di assets/dashboard.png, lalu ganti bagian ini dengan &lt;img src="assets/dashboard.png" alt="Dashboard SkinSight"&gt;</span></div>
 </header>
@@ -183,15 +183,14 @@ graph LR
 </div></section>
 
 <section id="pakai"><div class="wrap">
-<h2>Cara memakai</h2>
-<a class="btn" href="https://github.com/USERNAME/REPO/releases/latest">Unduh SkinSight untuk Windows</a>
-<p><span class="isi">ISI: ganti USERNAME/REPO dengan repo kalian. File .exe diunggah lewat menu Releases, bukan ke folder repo.</span></p>
+<h2>Alur penggunaan</h2>
+<p class="lead">Gambaran cara pengguna memakai SkinSight. Aplikasi sedang dalam pengembangan lanjutan dan belum dibagikan untuk umum.</p>
 <ol class="steps">
-<li>Unduh file zip dari halaman Releases dan ekstrak ke satu folder.</li>
-<li>Jalankan <code>SkinSight.exe</code> di dalam folder tersebut.</li>
-<li>Buat profil pengguna di halaman Pengaturan.</li>
-<li>Buka halaman Capture, hadapkan wajah ke kamera dengan cahaya cukup, lalu mulai analisis.</li>
-<li>Lihat hasil di halaman Analisis, lalu simpan sebagai PDF atau kirim lewat email.</li>
+<li>Pengguna membuat profil di halaman Pengaturan.</li>
+<li>Di halaman Capture, pengguna menghadap kamera dengan cahaya cukup, lalu memulai analisis.</li>
+<li>Hasil analisis dan estimasi detak jantung tampil di halaman Analisis.</li>
+<li>Hasil disimpan sebagai laporan PDF atau dikirim lewat email.</li>
+<li>Perubahan kondisi kulit dari waktu ke waktu dapat dilihat di halaman Tren.</li>
 </ol>
 </div></section>
 
@@ -227,7 +226,7 @@ graph LR
 ├── data/             deskripsi dataset dan hasil evaluasi
 ├── src/              kode sumber aplikasi
 ├── design/           mockup antarmuka dan diagram arsitektur
-├── procedures/       prosedur build dan pengujian
+├── procedures/       prosedur kerja dan pengujian
 └── assets/           screenshot dan video</pre>
 <div class="table-wrap"><table>
 <thead><tr><th>Folder</th><th>Isi</th></tr></thead>
@@ -236,7 +235,7 @@ graph LR
 <tr><td>data</td><td>Deskripsi 9 kategori, jumlah gambar, tabel evaluasi</td></tr>
 <tr><td>src</td><td><span class="isi">ISI: file kode yang disertakan</span></td></tr>
 <tr><td>design</td><td>Mockup UI dan diagram arsitektur</td></tr>
-<tr><td>procedures</td><td>Langkah build .exe dan prosedur pengujian real-time</td></tr>
+<tr><td>procedures</td><td>Prosedur pengembangan dan pengujian real-time</td></tr>
 </tbody></table></div>
 </div></section>
 
