@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkinSight | Analisis Kondisi Kulit Wajah</title>
+<meta name="description" content="SkinSight: aplikasi desktop untuk analisis kondisi kulit wajah berbasis ensemble deep learning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
+<!-- Cari teks "ISI" (Ctrl+F) untuk menemukan semua bagian yang perlu kamu isi sendiri. -->
+<style>
+:root{--ink:#3a1d2a;--mute:#7d5a68;--rose:#c9184a;--rose-d:#a4133c;--blush:#ffd6e0;--petal:#fff5f7;--line:#f2c9d4;--white:#fff;--r:14px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--petal);color:var(--ink);font:400 1rem/1.7 "DM Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0 0 .6em}
+h1{font-size:clamp(2.4rem,6vw,4rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800}
+h3{font-size:1.15rem;font-weight:600}
+a{color:var(--rose-d)}
+:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+section{padding:64px 0;border-top:1px solid var(--line)}
+section>.wrap>p.lead{max-width:62ch;color:var(--mute)}
+nav{position:sticky;top:0;z-index:20;background:rgba(255,245,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:6px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}
+nav b{font-family:Fraunces,serif;color:var(--rose);margin-right:10px;white-space:nowrap;align-self:center}
+nav a{white-space:nowrap;text-decoration:none;color:var(--ink);padding:6px 12px;border-radius:99px;font-size:.92rem}
+nav a:hover{background:var(--blush)}
+.hero{padding:72px 0 56px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero p{color:var(--mute);max-width:46ch;font-size:1.1rem}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}
+.badge{background:var(--blush);color:var(--rose-d);padding:3px 12px;border-radius:99px;font-size:.85rem;font-weight:500}
+.btn{display:inline-block;background:var(--rose);color:#fff;text-decoration:none;font-weight:700;padding:12px 24px;border-radius:99px;margin:0 8px 8px 0}
+.btn:hover{background:var(--rose-d)}
+.btn.alt{background:transparent;color:var(--rose-d);border:2px solid var(--rose)}
+.shot{aspect-ratio:4/3;background:var(--white);border:2px dashed var(--line);border-radius:var(--r);display:grid;place-items:center;text-align:center;color:var(--mute);padding:16px;overflow:hidden}
+.shot img,.shot video{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.isi{background:#fff0b8;color:#5b4700;padding:0 6px;border-radius:4px;font-size:.92em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:24px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.card p{margin:0;color:var(--mute);font-size:.95rem}
+.team .card{border-left:5px solid var(--rose)}
+.team .card b{display:block}
+.table-wrap{overflow-x:auto;margin-top:20px;background:var(--white);border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);font-size:.95rem}
+th{background:var(--blush);font-weight:700}
+tr:last-child td{border-bottom:0}
+.bar{display:inline-block;height:8px;border-radius:4px;background:var(--rose);vertical-align:middle;margin-right:8px}
+.stat{display:flex;gap:28px;flex-wrap:wrap;margin:22px 0 0}
+.stat div{font-family:Fraunces,serif;font-size:2rem;font-weight:800;color:var(--rose)}
+.stat span{display:block;font:400 .9rem "DM Sans",sans-serif;color:var(--mute)}
+.mermaid{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-top:20px;overflow-x:auto;text-align:center}
+ol.steps{padding-left:1.2em}
+ol.steps li{margin-bottom:.6em}
+pre{background:var(--ink);color:#ffe8ee;padding:16px;border-radius:10px;overflow-x:auto;font-size:.9rem}
+details{background:var(--white);border:1px solid var(--line);border-radius:var(--r);margin-top:12px}
+summary{cursor:pointer;padding:14px 18px;font-weight:700}
+details>div{padding:0 18px 16px;color:var(--mute)}
+details>div b{color:var(--ink)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px}
+figcaption{font-size:.88rem;color:var(--mute);margin-top:6px}
+figure{margin:0}
+footer{padding:32px 0;text-align:center;color:var(--mute);border-top:1px solid var(--line);font-size:.92rem}
+.tl{list-style:none;margin:28px 0 0;padding:0 0 0 28px;border-left:3px solid var(--line)}
+.tl li{position:relative;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:0 0 26px}
+.tl li::before{content:"";position:absolute;left:-37px;top:6px;width:15px;height:15px;border-radius:50%;background:var(--rose);border:3px solid var(--petal)}
+.tl li.berjalan::before{background:var(--white);border-color:var(--rose);box-shadow:0 0 0 3px var(--blush)}
+.tl li.rencana::before{background:var(--petal);border:2px dashed var(--mute)}
+.tl small{color:var(--mute);font-size:.88rem}
+.tl h3{margin:0 0 2px}
+.tl p{margin:0;color:var(--mute);font-size:.95rem;max-width:56ch}
+.st{flex:none;padding:3px 14px;border-radius:99px;font-size:.85rem;font-weight:700}
+.selesai .st{background:var(--rose-d);color:#fff}
+.berjalan .st{background:var(--blush);color:var(--rose-d)}
+.rencana .st{background:var(--white);color:var(--mute);border:1px dashed var(--mute)}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:40px}}
+</style>
+</head>
+<body>
+
+<nav aria-label="Navigasi utama"><div class="wrap">
+<b>SkinSight</b>
+<a href="#tim">Tim</a><a href="#jadwal">Jadwal</a><a href="#fitur">Fitur</a><a href="#arsitektur">Arsitektur</a><a href="#evaluasi">Evaluasi</a><a href="#stack">Komponen</a><a href="#pakai">Cara pakai</a><a href="#masalah">Troubleshooting</a><a href="#visual">Dokumentasi</a><a href="#repo">Struktur repo</a>
+</div></nav>
+
+<header class="wrap hero">
+<div>
+<h1>SkinSight</h1>
+<p>Aplikasi desktop Windows yang membaca kondisi kulit wajah dari kamera, menampilkan hasilnya dalam hitungan detik, dan menyimpan riwayat perubahannya. <span class="isi">ISI: sesuaikan tagline</span></p>
+<div class="badges">
+<span class="badge">Python</span><span class="badge">PyQt5</span><span class="badge">TensorFlow Lite</span><span class="badge">Ensemble Deep Learning</span><span class="badge">rPPG</span>
+</div>
+<a class="btn" href="#pakai">Unduh aplikasi</a><a class="btn alt" href="#fitur">Lihat fitur</a>
+</div>
+<div class="shot"><span class="isi">ISI: taruh screenshot dashboard di assets/dashboard.png, lalu ganti bagian ini dengan &lt;img src="assets/dashboard.png" alt="Dashboard SkinSight"&gt;</span></div>
+</header>
+
+<section id="tim"><div class="wrap team">
+<h2>Tim pengembang</h2>
+<p class="lead">Program Studi Teknik Biomedis, Institut Teknologi Sumatera. <span class="isi">ISI: mata kuliah dan dosen pengampu</span></p>
+<div class="grid">
+<div class="card"><b><span class="isi">ISI: Nama 1</span></b><p><span class="isi">ISI: NIM</span></p></div>
+<div class="card"><b><span class="isi">ISI: Nama 2</span></b><p><span class="isi">ISI: NIM</span></p></div>
+<div class="card"><b><span class="isi">ISI: Nama 3</span></b><p><span class="isi">ISI: NIM</span></p></div>
+</div>
+</div></section>
+
+<section id="jadwal"><div class="wrap">
+<h2>Jadwal kegiatan</h2>
+<p class="lead">Perjalanan SkinSight dari perancangan sampai rencana ke depan.</p>
+<ol class="tl" id="timeline"></ol>
+</div></section>
+
+<section id="fitur"><div class="wrap">
+<h2>Apa yang bisa dilakukan SkinSight</h2>
+<p class="lead">Pengguna cukup menghadap kamera. Hasil analisis, estimasi detak jantung, dan laporan dibuat dalam satu alur. <span class="isi">ISI: latar belakang masalah, 2 sampai 3 kalimat</span></p>
+<div class="grid">
+<div class="card"><h3>Analisis 9 kondisi kulit</h3><p>Jerawat, kulit berminyak, flek hitam, kemerahan, kulit kering, kerutan, komedo, mata panda, dan kulit normal.</p></div>
+<div class="card"><h3>Estimasi detak jantung</h3><p>Dihitung dari perubahan warna kulit pada kanal hijau kamera RGB biasa, tanpa sensor tambahan.</p></div>
+<div class="card"><h3>Laporan PDF dan email</h3><p>Hasil analisis disusun menjadi laporan PDF dan dapat dikirim langsung lewat email.</p></div>
+<div class="card"><h3>Profil dan tren</h3><p>Setiap pengguna punya profil. Halaman tren menampilkan perubahan kondisi kulit dari waktu ke waktu.</p></div>
+</div>
+</div></section>
+
+<section id="arsitektur"><div class="wrap">
+<h2>Arsitektur sistem</h2>
+<p class="lead">Alur data dari kamera sampai laporan. <span class="isi">ISI: ubah node diagram jika alur aplikasimu berbeda</span></p>
+<pre class="mermaid">
+graph LR
+  A[Kamera] --> B[Deteksi wajah]
+  B --> C[Model Keras kustom]
+  B --> D[Model Teachable Machine]
+  C --> E[Penggabungan prediksi]
+  D --> E
+  A --> F[Sinyal kanal hijau]
+  F --> G[Estimasi detak jantung]
+  E --> H[Hasil analisis]
+  G --> H
+  H --> I[Laporan PDF]
+  H --> J[Email]
+  H --> K[Riwayat dan tren]
+</pre>
+</div></section>
+
+<section id="evaluasi"><div class="wrap">
+<h2>Dataset dan evaluasi model</h2>
+<p class="lead">Model dilatih pada 15.500 gambar dengan 9 kategori. Evaluasi memakai 270 sampel uji, 30 sampel per kelas.</p>
+<div class="stat">
+<div>0,796<span>Accuracy</span></div><div>0,797<span>F1 rata-rata</span></div><div>300+<span>Pengujian real-time</span></div>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th>Kelas</th><th>Precision</th><th>Recall</th><th>F1-score</th></tr></thead>
+<tbody>
+<tr><td>Berjerawat</td><td>0,929</td><td>0,867</td><td><span class="bar" style="width:89px"></span>0,897</td></tr>
+<tr><td>Berminyak</td><td>0,679</td><td>0,633</td><td><span class="bar" style="width:65px"></span>0,655</td></tr>
+<tr><td>Flek hitam</td><td>0,815</td><td>0,733</td><td><span class="bar" style="width:77px"></span>0,772</td></tr>
+<tr><td>Kemerahan</td><td>0,750</td><td>0,800</td><td><span class="bar" style="width:77px"></span>0,774</td></tr>
+<tr><td>Kering</td><td>0,667</td><td>0,800</td><td><span class="bar" style="width:73px"></span>0,727</td></tr>
+<tr><td>Kerutan</td><td>0,935</td><td>0,967</td><td><span class="bar" style="width:95px"></span>0,951</td></tr>
+<tr><td>Komedo</td><td>0,828</td><td>0,800</td><td><span class="bar" style="width:81px"></span>0,814</td></tr>
+<tr><td>Mata panda</td><td>0,931</td><td>0,900</td><td><span class="bar" style="width:91px"></span>0,915</td></tr>
+<tr><td>Normal</td><td>0,667</td><td>0,667</td><td><span class="bar" style="width:67px"></span>0,667</td></tr>
+</tbody></table></div>
+<p><span class="isi">ISI: komentar singkat, misalnya kelas berminyak dan normal paling sulit dibedakan</span></p>
+</div></section>
+
+<section id="stack"><div class="wrap">
+<h2>Komponen perangkat lunak</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Kategori</th><th>Tools</th><th>Fungsi</th></tr></thead>
+<tbody>
+<tr><td>Bahasa</td><td>Python <span class="isi">ISI: versi</span></td><td>Logika utama aplikasi</td></tr>
+<tr><td>Antarmuka</td><td>PyQt5</td><td>Dashboard, Capture, Analisis, Tren, Pengaturan</td></tr>
+<tr><td>Model</td><td>Keras dan Teachable Machine, dikonversi ke TFLite</td><td>Klasifikasi kondisi kulit</td></tr>
+<tr><td>Visualisasi</td><td>Matplotlib</td><td>Grafik tren</td></tr>
+<tr><td>Distribusi</td><td>PyInstaller (onedir)</td><td>Paket .exe untuk Windows</td></tr>
+<tr><td>Lainnya</td><td><span class="isi">ISI: OpenCV, ReportLab, dll.</span></td><td><span class="isi">ISI</span></td></tr>
+</tbody></table></div>
+</div></section>
+
+<section id="pakai"><div class="wrap">
+<h2>Cara memakai</h2>
+<a class="btn" href="https://github.com/USERNAME/REPO/releases/latest">Unduh SkinSight untuk Windows</a>
+<p><span class="isi">ISI: ganti USERNAME/REPO dengan repo kalian. File .exe diunggah lewat menu Releases, bukan ke folder repo.</span></p>
+<ol class="steps">
+<li>Unduh file zip dari halaman Releases dan ekstrak ke satu folder.</li>
+<li>Jalankan <code>SkinSight.exe</code> di dalam folder tersebut.</li>
+<li>Buat profil pengguna di halaman Pengaturan.</li>
+<li>Buka halaman Capture, hadapkan wajah ke kamera dengan cahaya cukup, lalu mulai analisis.</li>
+<li>Lihat hasil di halaman Analisis, lalu simpan sebagai PDF atau kirim lewat email.</li>
+</ol>
+</div></section>
+
+<section id="masalah"><div class="wrap">
+<h2>Troubleshooting</h2>
+<details open><summary>Aplikasi tidak mau terbuka di sebagian komputer</summary>
+<div><p><b>Penyebab:</b> TensorFlow versi penuh memerlukan instruksi AVX pada CPU, dan sebagian komputer tidak memilikinya.</p>
+<p><b>Solusi:</b> model dikonversi ke TFLite, build dibuat dengan mode onedir, dan modul berat dimuat saat dibutuhkan.</p></div></details>
+<details><summary>Kamera tidak terdeteksi</summary>
+<div><p><span class="isi">ISI: penyebab dan solusi</span></p></div></details>
+<details><summary>Email gagal terkirim</summary>
+<div><p><span class="isi">ISI: penyebab dan solusi, misalnya koneksi atau sandi aplikasi Gmail</span></p></div></details>
+</div></section>
+
+<section id="visual"><div class="wrap">
+<h2>Dokumentasi visual</h2>
+<div class="gallery">
+<figure><div class="shot"><span class="isi">ISI: assets/capture.png</span></div><figcaption>Gambar 1. Halaman Capture. <span class="isi">ISI</span></figcaption></figure>
+<figure><div class="shot"><span class="isi">ISI: assets/analisis.png</span></div><figcaption>Gambar 2. Halaman Analisis. <span class="isi">ISI</span></figcaption></figure>
+<figure><div class="shot"><span class="isi">ISI: assets/tren.png</span></div><figcaption>Gambar 3. Halaman Tren. <span class="isi">ISI</span></figcaption></figure>
+</div>
+<h3 style="margin-top:32px">Video demonstrasi</h3>
+<div class="shot" style="aspect-ratio:16/9"><span class="isi">ISI: tempel embed YouTube di sini, atau pakai &lt;video controls src="assets/demo.mp4"&gt;</span></div>
+</div></section>
+
+<section id="repo"><div class="wrap">
+<h2>Struktur repositori</h2>
+<p class="lead">Repositori ini disusun agar dokumentasi, data, kode, desain, dan prosedur kerja mudah ditemukan.</p>
+<pre>skinsight/
+├── index.html        halaman dokumentasi ini
+├── README.md         ringkasan proyek dan cara menjalankan
+├── docs/             dokumentasi teknis dan laporan
+├── data/             deskripsi dataset dan hasil evaluasi
+├── src/              kode sumber aplikasi
+├── design/           mockup antarmuka dan diagram arsitektur
+├── procedures/       prosedur build dan pengujian
+└── assets/           screenshot dan video</pre>
+<div class="table-wrap"><table>
+<thead><tr><th>Folder</th><th>Isi</th></tr></thead>
+<tbody>
+<tr><td>docs</td><td><span class="isi">ISI: daftar dokumen</span></td></tr>
+<tr><td>data</td><td>Deskripsi 9 kategori, jumlah gambar, tabel evaluasi</td></tr>
+<tr><td>src</td><td><span class="isi">ISI: file kode yang disertakan</span></td></tr>
+<tr><td>design</td><td>Mockup UI dan diagram arsitektur</td></tr>
+<tr><td>procedures</td><td>Langkah build .exe dan prosedur pengujian real-time</td></tr>
+</tbody></table></div>
+</div></section>
+
+<footer>© 2026 SkinSight, Teknik Biomedis ITERA. <span class="isi">ISI: nama mata kuliah</span></footer>
+
+<script>
+/* ===== EDIT JADWAL DI SINI =====
+   status: "selesai", "berjalan", atau "rencana" (label di kanan ikut berubah otomatis).
+   Tambah kegiatan dengan menyalin satu baris {...}, hapus dengan menghapus barisnya. */
+const JADWAL=[
+ {periode:"Maret 2026",judul:"Perancangan konsep dan studi literatur",desc:"Menentukan masalah, fitur utama, dan pendekatan analisis kulit.",status:"selesai"},
+ {periode:"ISI: periode",judul:"Pengumpulan dataset",desc:"15.500 gambar dalam 9 kategori kondisi kulit.",status:"selesai"},
+ {periode:"ISI: periode",judul:"Pelatihan dan evaluasi model",desc:"Model Keras kustom dan Teachable Machine, diuji pada 270 sampel.",status:"selesai"},
+ {periode:"ISI: periode",judul:"Pengembangan aplikasi PyQt5",desc:"Analisis, estimasi detak jantung, laporan PDF, email, profil, dan tren.",status:"selesai"},
+ {periode:"ISI: periode",judul:"Redesign antarmuka",desc:"Dashboard, Capture, Analisis, Tren, dan Pengaturan.",status:"selesai"},
+ {periode:"ISI: periode",judul:"Optimasi distribusi",desc:"Konversi TFLite dan build onedir agar berjalan di lebih banyak komputer.",status:"selesai"},
+ {periode:"ISI: periode",judul:"Pengujian real-time",desc:"Lebih dari 300 kali pengujian langsung.",status:"selesai"},
+ {periode:"ISI: periode",judul:"Dokumentasi teknis dan dokumen paten",desc:"Penyusunan dokumentasi dan dokumen pendaftaran.",status:"berjalan"},
+ {periode:"ISI: periode",judul:"Pendaftaran paten ke DJKI",desc:"ISI: sesuaikan",status:"rencana"},
+ {periode:"ISI: periode",judul:"Peningkatan akurasi kelas berminyak dan normal",desc:"ISI: sesuaikan",status:"rencana"},
+ {periode:"ISI: periode",judul:"Uji coba pengguna lebih luas dan rilis resmi",desc:"ISI: sesuaikan",status:"rencana"}
+];
+const LABEL={selesai:"Selesai",berjalan:"Berjalan",rencana:"Rencana"};
+document.getElementById("timeline").innerHTML=JADWAL.map(j=>{
+ const w=t=>t.startsWith("ISI")?'<span class="isi">'+t+'</span>':t;
+ return '<li class="'+j.status+'"><div><small>'+w(j.periode)+'</small><h3>'+j.judul+'</h3><p>'+w(j.desc)+'</p></div><span class="st">'+LABEL[j.status]+'</span></li>';
+}).join("");
+</script>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.esm.min.mjs';
+mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{primaryColor:'#ffd6e0',primaryBorderColor:'#c9184a',primaryTextColor:'#3a1d2a',lineColor:'#a4133c',fontFamily:'DM Sans, sans-serif'}});
+</script>
+</body>
+</html>
