@@ -2,10 +2,17 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<script>if("IntersectionObserver" in window)document.documentElement.classList.add("js")</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SkinSight | Analisis Kondisi Kulit Wajah</title>
 <link rel="icon" type="image/png" href="assets/logo.png">
 <meta name="description" content="SkinSight: aplikasi desktop untuk analisis kondisi kulit wajah berbasis ensemble deep learning.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SkinSight | Analisis Kondisi Kulit Wajah">
+<meta property="og:description" content="Aplikasi desktop untuk analisis kondisi kulit wajah berbasis ensemble deep learning.">
+<meta property="og:image" content="https://arifa123430107-debug.github.io/skinsight/assets/dashboard.png">
+<meta property="og:url" content="https://arifa123430107-debug.github.io/skinsight/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
@@ -62,7 +69,7 @@ summary{cursor:pointer;padding:14px 18px;font-weight:700}
 details>div{padding:0 18px 16px;color:var(--mute)}
 details>div b{color:var(--ink)}
 .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px}
-figcaption{font-size:.88rem;color:var(--mute);margin-top:6px}
+figcaption{font-size:.88rem;color:var(--mute);margin-top:8px;text-align:center}
 figure{margin:0}
 footer{padding:32px 0;text-align:center;color:var(--mute);border-top:1px solid var(--line);font-size:.92rem}
 .tl{list-style:none;margin:28px 0 0;padding:0 0 0 28px;border-left:3px solid var(--line)}
@@ -81,9 +88,40 @@ footer{padding:32px 0;text-align:center;color:var(--mute);border-top:1px solid v
 nav b{display:inline-flex;align-items:center;gap:8px}
 nav b img{height:30px;width:auto}
 .logo-hero{height:64px;width:auto;margin-bottom:16px}
+.shot img{cursor:zoom-in}
+#lightbox{position:fixed;inset:0;z-index:100;background:rgba(58,29,42,.88);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+#lightbox.on{display:flex}
+#lightbox img{max-width:100%;max-height:100%;border-radius:10px;background:#fff}
+.note{background:var(--white);border:1px solid var(--line);border-left:5px solid var(--rose);border-radius:var(--r);padding:18px 20px;margin-top:20px}
+.note ul{margin:10px 0 0;padding-left:1.2em;color:var(--mute)}
 .video{aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#000}
 .video iframe{width:100%;height:100%;border:0}
 @media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:40px}}
+/* menu aktif */
+nav a{transition:background .2s,color .2s}
+nav a.on{background:var(--rose);color:#fff}
+
+/* tombol kembali ke atas */
+#top{position:fixed;right:20px;bottom:20px;z-index:30;width:46px;height:46px;border:0;border-radius:50%;background:var(--rose);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 16px rgba(201,24,74,.3);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .25s,transform .25s,visibility .25s}
+#top.show{opacity:1;visibility:visible;transform:none}
+#top:hover{background:var(--rose-d)}
+
+/* animasi muncul saat scroll */
+.js section>.wrap{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.js section>.wrap.in{opacity:1;transform:none}
+
+@media(prefers-reduced-motion:reduce){
+  .js section>.wrap{opacity:1;transform:none;transition:none}
+  #top{transition:none}
+}
+@media(prefers-reduced-motion:no-preference){
+  .hero>div{animation:naik .8s ease both}
+  .hero>div.shot{animation-delay:.15s}
+  @keyframes naik{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+}
+.js section>.wrap{transform:translateY(28px);transition-duration:.8s}
+.js section>.wrap.in{transform:none}
+
 </style>
 </head>
 <body>
@@ -175,6 +213,25 @@ graph LR
 <p><span class="catatan">Kelas berminyak dan normal masih menunjukkan tingkat kesalahan klasifikasi yang relatif tinggi akibat kemiripan karakteristik visual dan pengaruh pencahayaan, sehingga diperlukan optimalisasi preprocessing dan penambahan variasi data untuk meningkatkan akurasi klasifikasi.</span></p>
 </div></section>
 
+<figure style="max-width:560px;margin:24px auto 0">
+  <div class="shot"><img src="assets/confusion-matrix.png" alt="Confusion matrix evaluasi model"></div>
+  <figcaption>Confusion matrix pada 270 sampel uji (30 sampel per kelas)</figcaption>
+</figure>
+
+<section id="batasan"><div class="wrap">
+<h2>Batasan dan catatan penggunaan</h2>
+<div class="note">
+<b>SkinSight adalah alat bantu skrining awal, bukan pengganti diagnosis tenaga medis.</b>
+<ul>
+<li>Hasil analisis perlu dikonfirmasi oleh dokter atau dermatolog sebelum menentukan perawatan.</li>
+<li>Akurasi kelas kulit berminyak dan normal masih lebih rendah dibanding kelas lain.</li>
+<li>Hasil dipengaruhi pencahayaan dan kualitas kamera.</li>
+<li>Estimasi detak jantung bersifat perkiraan, bukan alat ukur medis.</li>
+<li>Cakupan analisis terbatas pada 9 kategori kondisi kulit.</li>
+</ul>
+</div>
+</div></section>
+
 <section id="stack"><div class="wrap">
 <h2>Komponen perangkat lunak</h2>
 <div class="table-wrap"><table>
@@ -256,6 +313,15 @@ graph LR
 
 <footer>© 2026 SkinSight, Teknik Biomedis ITERA. <span class="isi">Mata Kuliah Pengembangan Sistem Biomedis</span></footer>
 
+<div id="lightbox" role="dialog" aria-label="Pratinjau gambar"><img alt=""></div>
+
+<script>
+const lb=document.getElementById("lightbox"),lbi=lb.querySelector("img");
+document.querySelectorAll(".shot img").forEach(i=>i.addEventListener("click",()=>{lbi.src=i.src;lbi.alt=i.alt;lb.classList.add("on")}));
+lb.addEventListener("click",()=>lb.classList.remove("on"));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")lb.classList.remove("on")});
+</script>
+
 <script>
 /* ===== EDIT JADWAL DI SINI =====
    status: "selesai", "berjalan", atau "rencana" (label di kanan ikut berubah otomatis).
@@ -283,5 +349,41 @@ document.getElementById("timeline").innerHTML=JADWAL.map(j=>{
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.esm.min.mjs';
 mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{primaryColor:'#ffd6e0',primaryBorderColor:'#c9184a',primaryTextColor:'#3a1d2a',lineColor:'#a4133c',fontFamily:'DM Sans, sans-serif'}});
 </script>
+<button id="top" aria-label="Kembali ke atas">↑</button>
+
+<script>
+(function(){
+ const secs=[...document.querySelectorAll("section[id]")];
+ const links=[...document.querySelectorAll("nav a[href^='#']")];
+ const navWrap=document.querySelector("nav .wrap");
+ const top=document.getElementById("top");
+
+ /* muncul perlahan saat di-scroll */
+ const rv=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("in");rv.unobserve(e.target)}
+ }),{rootMargin:"0px 0px -8% 0px"});
+ document.querySelectorAll("section>.wrap").forEach(w=>rv.observe(w));
+
+ /* menu menyala sesuai bagian yang sedang dilihat */
+ const spy=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id));
+  const a=links.find(x=>x.classList.contains("on"));
+  if(a){
+   const r=a.getBoundingClientRect(),n=navWrap.getBoundingClientRect();
+   navWrap.scrollTo({left:navWrap.scrollLeft+r.left-n.left-(n.width-r.width)/2,behavior:"smooth"});
+  }
+ }),{rootMargin:"-45% 0px -50% 0px"});
+ secs.forEach(s=>spy.observe(s));
+
+ /* tombol kembali ke atas */
+ addEventListener("scroll",()=>{
+  top.classList.toggle("show",scrollY>600);
+  if(scrollY<300)links.forEach(a=>a.classList.remove("on"));
+ },{passive:true});
+ top.addEventListener("click",()=>scrollTo({top:0,behavior:"smooth"}));
+})();
+</script>
+
 </body>
 </html>
