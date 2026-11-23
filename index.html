@@ -128,7 +128,7 @@ nav a.on{background:var(--rose);color:#fff}
 
 <nav aria-label="Navigasi utama"><div class="wrap">
 <b><img src="assets/logo.png" alt="Logo SkinSight">SkinSight</b>
-<a href="#tim">Tim</a><a href="#jadwal">Jadwal</a><a href="#fitur">Fitur</a><a href="#arsitektur">Arsitektur</a><a href="#evaluasi">Evaluasi</a><a href="#stack">Komponen</a><a href="#pakai">Alur penggunaan</a><a href="#masalah">Troubleshooting</a><a href="#visual">Dokumentasi</a><a href="#repo">Struktur repo</a>
+<a href="#tim">Tim</a><a href="#jadwal">Jadwal</a><a href="#fitur">Fitur</a><a href="#demo">Demo web</a><a href="#arsitektur">Arsitektur</a><a href="#evaluasi">Evaluasi</a><a href="#stack">Komponen</a><a href="#pakai">Alur penggunaan</a><a href="#masalah">Troubleshooting</a><a href="#visual">Dokumentasi</a><a href="#repo">Struktur repo</a>
 </div></nav>
 
 <header class="wrap hero">
@@ -139,7 +139,7 @@ nav a.on{background:var(--rose);color:#fff}
 <div class="badges">
 <span class="badge">Python</span><span class="badge">PyQt5</span><span class="badge">TensorFlow Lite</span><span class="badge">Ensemble Deep Learning</span><span class="badge">rPPG</span>
 </div>
-<a class="btn" href="#fitur">Lihat fitur</a><a class="btn alt" href="#visual">Lihat dokumentasi</a>
+<a class="btn" href="demo/index.html">Coba demo web</a><a class="btn alt" href="#fitur">Lihat fitur</a>
 </div>
 <div class="shot"><img src="assets/dashboard.png" alt="Dashboard SkinSight"></div>
 </header>
@@ -247,6 +247,18 @@ graph LR
 </tbody></table></div>
 </div></section>
 
+<section id="demo"><div class="wrap">
+<h2>Coba langsung di browser</h2>
+<p class="lead">Versi demo web SkinSight. Ambil foto wajah, model ensemble mendeteksi 9 kategori kondisi kulit, lalu sistem menampilkan skor, rekomendasi skincare, dan anotasi zona pada wajah Anda.</p>
+<div class="grid">
+<div class="card"><h3>Berjalan di perangkat Anda</h3><p>Seluruh pemrosesan — deteksi wajah, koreksi warna, dan inferensi model — terjadi di browser. Wajah tidak pernah dikirim ke server mana pun.</p></div>
+<div class="card"><h3>Model yang sama</h3><p>Dua model dikonversi ke TFLite fp16, lalu digabung dengan bobot 30% Teachable Machine dan 70% model kustom EfficientNetB3.</p></div>
+<div class="card"><h3>Unduhan sekali</h3><p>Sekitar 50 MB diunduh saat pertama dibuka, lalu di-cache browser. Setelah itu demo berjalan cepat.</p></div>
+</div>
+<p style="margin:22px 0 0"><a class="btn" href="demo/index.html">Buka demo web</a><a class="btn alt" href="demo/README.md">Cara menjalankan &amp; deploy</a></p>
+<p class="catatan" style="margin-top:16px">Demo web hanya menyediakan capture, analisis, dan rekomendasi. Unduh laporan PDF dan kirim lewat email tetap dilakukan lewat aplikasi desktop SkinSight untuk Windows.</p>
+</div></section>
+
 <section id="pakai"><div class="wrap">
 <h2>Alur penggunaan</h2>
 <p class="lead">Gambaran cara pengguna memakai SkinSight. Aplikasi sedang dalam pengembangan lanjutan dan belum dibagikan untuk umum.</p>
@@ -298,6 +310,7 @@ graph LR
 ├── docs/             dokumentasi teknis dan laporan
 ├── data/             deskripsi dataset dan hasil evaluasi
 ├── src/              kode sumber aplikasi
+├── demo/             versi demo web (inferensi di browser)
 ├── design/           mockup antarmuka dan diagram arsitektur
 ├── procedures/       prosedur kerja dan pengujian
 └── assets/           screenshot dan video</pre>
@@ -307,6 +320,7 @@ graph LR
 <tr><td>docs</td><td><span class="isi">7 dokumen pendukung, meliputi BMSeries dan informasi teknis aplikasi</span></td></tr>
 <tr><td>data</td><td>Deskripsi 9 kategori, jumlah gambar, tabel evaluasi</td></tr>
 <tr><td>src</td><td><span class="isi">3 file python mencakup training model, evaluasi, dan deployment</span></td></tr>
+<tr><td>demo</td><td><span class="isi">Versi demo web: analisis kulit wajah langsung di browser, seluruh inferensi berjalan di sisi klien</span></td></tr>
 <tr><td>design</td><td>Mockup UI dan diagram arsitektur</td></tr>
 <tr><td>procedures</td><td>Prosedur pengembangan dan pengujian real-time</td></tr>
 </tbody></table></div>

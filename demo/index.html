@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Web — SkinSight | Analisis Kondisi Kulit Wajah</title>
+<meta name="description" content="Coba SkinSight langsung di browser. Analisis kondisi kulit wajah 9 kategori dan rekomendasi skincare — seluruhnya berjalan di perangkat Anda.">
+<link rel="icon" type="image/png" href="../assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#3a1d2a;--mute:#7d5a68;--rose:#c9184a;--rose-d:#a4133c;--blush:#ffd6e0;--petal:#fff5f7;--line:#f2c9d4;--white:#fff;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--petal);color:var(--ink);font:400 1rem/1.7 "DM Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0 0 .5em}
+h1{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.3rem,3vw,1.8rem);font-weight:800}
+h3{font-size:1.1rem;font-weight:600}
+a{color:var(--rose-d)}
+:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+header.top{border-bottom:1px solid var(--line);background:var(--white)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:Fraunces,serif;font-weight:800;font-size:1.15rem;color:var(--rose);text-decoration:none}
+.brand img{height:32px;width:auto}
+.back{font-size:.92rem;color:var(--mute);text-decoration:none}
+.back:hover{color:var(--rose-d)}
+
+.intro{padding:40px 0 8px}
+.intro p{color:var(--mute);max-width:60ch;margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+.chips li{background:var(--blush);color:var(--rose-d);padding:3px 12px;border-radius:99px;font-size:.85rem;font-weight:500}
+
+.stage{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;margin:26px 0 40px;align-items:start}
+@media(max-width:900px){.stage{grid-template-columns:1fr}}
+
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.viewport{position:relative;background:#1b1016;border-radius:12px;overflow:hidden;aspect-ratio:4/3}
+.viewport video,.viewport canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.viewport canvas{pointer-events:none}
+.vp-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#e9c9d4;font-size:.95rem;text-align:center;padding:20px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{background:var(--rose);color:#fff;border:0;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:99px;cursor:pointer;font-size:.95rem;font-family:inherit}
+.btn:hover{background:var(--rose-d)}
+.btn:disabled{background:#d9b9c4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--rose-d);border:2px solid var(--rose)}
+.btn.ghost:hover{background:var(--blush)}
+.status{font-size:.92rem;color:var(--mute);margin:12px 0 0}
+.status.error{color:var(--rose-d);font-weight:500}
+.note{background:var(--white);border:1px solid var(--line);border-left:5px solid var(--rose);border-radius:var(--r);padding:14px 16px;margin-top:14px;font-size:.9rem;color:var(--mute)}
+
+.progress{margin-top:14px}
+.progress .track{height:7px;background:var(--blush);border-radius:4px;overflow:hidden}
+.progress .track i{display:block;height:100%;background:var(--rose);width:0;transition:width .25s}
+.progress span{display:block;font-size:.85rem;color:var(--mute);margin-bottom:5px}
+
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--blush);color:var(--rose-d);padding:5px 14px;border-radius:99px;font-size:.9rem;font-weight:700;margin-bottom:14px}
+.conf-bars{letter-spacing:1px}
+
+.conds{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:0 0 22px;padding:0;list-style:none}
+.cond{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:11px 13px}
+.cond-head{display:flex;align-items:center;gap:7px;font-size:.93rem}
+.cond-head .dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+.cond-head b{flex:1;font-weight:600}
+.sev{font-size:.72rem;font-weight:700;color:var(--mute);background:var(--petal);padding:1px 8px;border-radius:99px;white-space:nowrap}
+.bar{height:6px;background:var(--blush);border-radius:3px;overflow:hidden;margin:8px 0 5px}
+.bar i{display:block;height:100%;background:var(--c)}
+.cond-foot{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mute)}
+
+.rec{border-top:1px solid var(--line);padding-top:16px;margin-top:4px}
+.combo{background:var(--petal);border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-bottom:16px}
+.combo>b{font-family:Fraunces,serif;font-size:1.05rem;color:var(--rose-d)}
+.blk{margin-top:13px}
+.blk h4{margin:0 0 5px;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;color:var(--rose-d)}
+.blk ul{margin:0;padding-left:1.15em;font-size:.92rem}
+.blk li{margin-bottom:4px}
+.cond-reco{border-top:1px dashed var(--line);padding-top:13px;margin-top:13px}
+.cond-reco>b{font-size:1rem}
+.expl{font-size:.93rem;color:var(--mute);text-align:justify}
+.expl-in{background:var(--petal);border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-top:16px}
+.expl-in b{font-family:Fraunces,serif;color:var(--rose-d)}
+
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--mute);font-size:.9rem;text-align:center;margin-top:20px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><img src="../assets/logo.png" alt="Logo SkinSight">SkinSight</a>
+    <a class="back" href="../index.html">← Kembali ke halaman proyek</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="intro">
+    <h1>Demo Web SkinSight</h1>
+    <p>Versi demo dari aplikasi desktop SkinSight. Ambil foto wajah, model ensemble kami
+       mendeteksi 9 kategori kondisi kulit, lalu sistem menampilkan skor, rekomendasi
+       skincare, dan anotasi zona pada wajah Anda.</p>
+    <ul class="chips">
+      <li>Berjalan penuh di browser</li>
+      <li>Wajah tidak dikirim ke server</li>
+      <li>Ensemble 2 model</li>
+      <li>±24 MB diunduh saat pertama dibuka</li>
+    </ul>
+  </section>
+
+  <section class="stage">
+    <!-- ── Kolom kiri: kamera ── -->
+    <div>
+      <div class="card">
+        <div class="viewport">
+          <video id="video" playsinline muted autoplay></video>
+          <canvas id="overlay"></canvas>
+          <div class="vp-empty" id="vpEmpty">Kamera belum aktif.<br>Tekan "Aktifkan Kamera" di bawah.</div>
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="startBtn" disabled>Aktifkan Kamera</button>
+          <button class="btn ghost" id="captureBtn" disabled>Capture &amp; Analisis</button>
+        </div>
+
+        <p class="status" id="status">Menyiapkan…</p>
+
+        <div class="progress" id="progress" hidden>
+          <span>Menyiapkan…</span>
+          <div class="track"><i id="progressBar"></i></div>
+        </div>
+
+        <div class="note" id="privacyNote">
+          Semua pemrosesan berjalan di perangkat Anda — wajah tidak pernah dikirim ke server mana pun.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Kolom kanan: hasil ── -->
+    <div>
+      <div id="resultPanel" hidden>
+        <div class="badge" id="confidenceBadge"></div>
+        <h2>Hasil Analisis</h2>
+        <ul class="conds" id="conditions"></ul>
+
+        <h2>Rekomendasi Perawatan</h2>
+        <div class="rec" id="recommendations"></div>
+
+        <div class="expl-in" id="explanation"></div>
+      </div>
+
+      <div class="card" id="emptyState">
+        <h3>Belum ada hasil</h3>
+        <p style="color:var(--mute);margin:0;font-size:.95rem">
+          Aktifkan kamera lalu tekan <b>Capture &amp; Analisis</b>. Sistem mengambil 30 frame
+          wajah, menjalankan kedua model, lalu menggabungkan hasilnya dengan analisis tekstur kulit.
+        </p>
+        <p style="color:var(--mute);margin:12px 0 0;font-size:.88rem">
+          <b>Tips:</b> gunakan pencahayaan terang dan merata, hadapkan wajah lurus ke kamera,
+          dan pastikan hanya satu wajah dalam bingkai.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="note" style="margin-bottom:40px">
+    <b>Catatan.</b> Demo ini adalah alat bantu skrining awal, <b>bukan pengganti diagnosis
+    tenaga medis</b>. Hasil tidak harnessing daftar lengkap fitur aplikasi desktop —
+    unduh laporan PDF dan kirim lewat email tetap dilakukan lewat aplikasi SkinSight
+    untuk Windows.
+  </div>
+</div>
+
+<footer>
+  © 2026 SkinSight, Teknik Biomedis ITERA · Program Studi Teknik Biomedis, Institut Teknologi Sumatera
+</footer>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
