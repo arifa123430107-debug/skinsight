@@ -56,6 +56,7 @@ header.top .wrap{display:flex;align-items:center;justify-content:space-between;g
 .progress .track i{display:block;height:100%;background:var(--rose);width:0;transition:width .25s}
 .progress span{display:block;font-size:.85rem;color:var(--mute);margin-bottom:5px}
 
+.annot{display:block;width:100%;border-radius:12px;margin-bottom:14px}
 .badge{display:inline-flex;align-items:center;gap:8px;background:var(--blush);color:var(--rose-d);padding:5px 14px;border-radius:99px;font-size:.9rem;font-weight:700;margin-bottom:14px}
 .conf-bars{letter-spacing:1px}
 
@@ -140,6 +141,9 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--mute);font-si
     <!-- ── Kolom kanan: hasil ── -->
     <div>
       <div id="resultPanel" hidden>
+        <img id="annotatedImg" class="annot" alt="Hasil anotasi zona wajah" hidden>
+        <div class="badge" id="confidenceBadge"></div>
+        <h2>Hasil Analisis</h2>
         <div class="badge" id="confidenceBadge"></div>
         <h2>Hasil Analisis</h2>
         <ul class="conds" id="conditions"></ul>

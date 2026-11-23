@@ -28,8 +28,16 @@ const state = {
   ready: false,
   busy: false,
   capturing: false,
+  frozen: false,        // true = layar menampilkan hasil anotasi
   lastBox: null,
 };
+
+const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const FRAMES = IS_MOBILE ? 10 : SNAPSHOT_FRAMES;   // jumlah frame yang dirata-rata
+const PREVIEW_W = 320;                            // lebar frame untuk deteksi pratinjau
+const PREVIEW_H = Math.round(PREVIEW_W * (3/4));  // tinggi frame untuk deteksi pratinjau
+
+
 
 const els = {};
 
@@ -53,6 +61,7 @@ function init() {
   els.progressEl = $('#progress');
   els.progressBar = $('#progressBar');
   els.vpEmpty = $('#vpEmpty');
+  els.annotImg = $('#annotatedImg');
 
   els.startBtn.addEventListener('click', startCamera);
   els.captureBtn.addEventListener('click', capture);
@@ -159,31 +168,68 @@ function startPreviewLoop() {
 
   function tick(ts) {
     requestAnimationFrame(tick);
-    if (!els.video.videoWidth || state.capturing) return;
+    if (!els.video.videoWidth || state.capturing || state.frozen || document.hidden) return;
+    if (previewBusy || ts - lastPreview < 250) return;   // ~4x/detik
+    previewBusy = true;
+    lastPreview = ts;
 
-    // Batasi deteksi wajah ~5x/detik
-    if (!previewBusy && ts - lastPreview > 200) {
-      previewBusy = true;
-      lastPreview = ts;
-      scratch.width = els.video.videoWidth;
-      scratch.height = els.video.videoHeight;
-      sctx.drawImage(els.video, 0, 0, scratch.width, scratch.height);
-      const data = sctx.getImageData(0, 0, scratch.width, scratch.height);
-      const buf = new Uint8Array(data.data.length);
-      buf.set(data.data);
-      sendToWorker({ type: 'detect', frame: buf.buffer, w: scratch.width, h: scratch.height })
-        .then((res) => {
-          state.lastBox = res.box;
-          drawPreview(res.box);
-        })
-        .catch(() => {})
-        .finally(() => { previewBusy = false; });
-    }
+    // Deteksi di frame kecil (lebar 320); kotak diskalakan balik.
+    const vw = els.video.videoWidth;
+    const vh = els.video.videoHeight;
+    const scale = Math.min(1, PREVIEW_W / vw);
+    scratch.width = Math.round(vw * scale);
+    scratch.height = Math.round(vh * scale);
+    sctx.drawImage(els.video, 0, 0, scratch.width, scratch.height);
+    const data = sctx.getImageData(0, 0, scratch.width, scratch.height);
+
+    sendToWorker(
+      { type: 'detect', frame: data.data.buffer, w: scratch.width, h: scratch.height },
+      [data.data.buffer]
+    )
+      .then((res) => {
+        const b = res.box
+          ? { x: res.box.x / scale, y: res.box.y / scale, w: res.box.w / scale, h: res.box.h / scale }
+          : null;
+        state.lastBox = b;
+        if (!state.frozen && !state.capturing) drawPreview(b);
+      })
+      .catch(() => {})
+      .finally(() => { previewBusy = false; });
   }
   requestAnimationFrame(tick);
 }
 
+/** Overlay transparan: hanya kotak wajah. Videonya tetap berjalan mulus di belakangnya. */
+function drawPreview(box) {
+  const vw = els.video.videoWidth;
+  const vh = els.video.videoHeight;
+  if (!vw) return;
+  if (els.canvas.width !== vw || els.canvas.height !== vh) {
+    els.canvas.width = vw;
+    els.canvas.height = vh;
+  }
+}
+
+/** Kembali ke kamera langsung setelah hasil anotasi ditampilkan. */
+function unfreeze() {
+  state.frozen = false;
+  els.ctx.clearRect(0, 0, els.canvas.width, els.canvas.height);
+  els.captureBtn.textContent = 'Capture & Analisis';
+  setStatus('Kamera aktif. Posisikan wajah di tengah bingkai, lalu tekan Capture.');
+}
+
+/** Tunggu frame video berikutnya (agar tiap frame yang dirata-rata benar-benar berbeda). */
+function nextVideoFrame(video) {
+  return new Promise((resolve) => {
+    const t = setTimeout(resolve, 120);
+    if (video.requestVideoFrameCallback) {
+      video.requestVideoFrameCallback(() => { clearTimeout(t); resolve(); });
+    }
+  });
+}
+
 /** Gambar video + kotak wajah di canvas overlay. */
+/*
 function drawPreview(box) {
   const vw = els.video.videoWidth;
   const vh = els.video.videoHeight;
@@ -196,19 +242,20 @@ function drawPreview(box) {
     els.ctx.lineWidth = 2;
     els.ctx.strokeRect(box.x, box.y, box.w, box.h);
   }
-}
+} */
 
 /* ──────────────────────────────────────────────────────────────
    CAPTURE
    ────────────────────────────────────────────────────────────── */
 
 async function capture() {
+  if (state.frozen) { unfreeze(); return; }   // tombol 'Ambil Ulang'
   if (state.busy || !state.ready) return;
   if (!state.stream) {
     setStatus('Aktifkan kamera dulu.', true);
     return;
   }
-
+  
   state.busy = true;
   state.capturing = true;
   els.captureBtn.disabled = true;
@@ -234,7 +281,7 @@ async function capture() {
     const frameBuf = new Uint8Array(frameData.data.length);
     frameBuf.set(frameData.data);
 
-    const det = await sendToWorker({ type: 'detect', frame: frameBuf.buffer, w: W, h: H });
+    const det = await sendToWorker({ type: 'detect', frame: frameBuf.buffer, w: W, h: H }, [frameBuf.buffer]);
     if (!det.box) {
       setStatus('Wajah tidak terdeteksi. Pastikan wajah terlihat jelas, pencahayaan cukup, dan hanya satu wajah dalam bingkai.', true);
       return;
@@ -252,24 +299,18 @@ async function capture() {
     const box = { x: fx, y: fy, w: fw, h: fh };
 
     // --- 4. Kumpulkan 30 crop wajah dari video
-    showProgress('Mengambil 30 frame…', 0.18);
+    showProgress('Mengambil ' + FRAMES + ' frame…', 0.18);
     const cropCanvas = document.createElement('canvas');
     cropCanvas.width = fw;
     cropCanvas.height = fh;
     const cctx = cropCanvas.getContext('2d', { willReadFrequently: true });
 
     const crops = [];
-    for (let i = 0; i < SNAPSHOT_FRAMES; i++) {
-      fctx.drawImage(video, 0, 0, W, H);
-      cctx.drawImage(full, fx, fy, fw, fh, 0, 0, fw, fh);
-      const cd = cctx.getImageData(0, 0, fw, fh);
-      const cb = new Uint8Array(cd.data.length);
-      cb.set(cd.data);
-      crops.push(cb.buffer);
-      if (i % 10 === 0) {
-        showProgress('Mengambil 30 frame…', 0.18 + 0.17 * (i / SNAPSHOT_FRAMES));
-        await nextTick();
-      }
+    for (let i = 0; i < FRAMES; i++) {
+      cctx.drawImage(video, fx, fy, fw, fh, 0, 0, fw, fh);
+      crops.push(cctx.getImageData(0, 0, fw, fh).data.buffer);
+      showProgress('Mengambil ' + FRAMES + ' frame…', 0.18 + 0.17 * ((i + 1) / FRAMES));
+      if (i < FRAMES - 1) await nextVideoFrame(video);
     }
 
     // --- 5. Worker: CLAHE + rule-based + inferensi ensemble
@@ -279,7 +320,8 @@ async function capture() {
       crops,
       w: fw,
       h: fh,
-    });
+    }, crops);
+    
 
     // --- 6. Agregasi & render
     showProgress('Menggabungkan hasil…', 0.95);
@@ -301,7 +343,8 @@ async function capture() {
     state.busy = false;
     state.capturing = false;
     els.captureBtn.disabled = false;
-    els.captureBtn.textContent = 'Capture & Analisis';
+    els.captureBtn.textContent = state.frozen ? 'Ambil Ulang' : 'Capture & Analisis';
+    
   }
 }
 
@@ -313,6 +356,7 @@ let msgSeq = 0;
 const pending = new Map();
 
 /** Listener pesan worker — dipasang sekali worker dibuat. */
+/** Listener pesan worker — dipasang sekali worker dibuat. */
 function attachWorkerListener(worker) {
   worker.addEventListener('message', (e) => {
     const d = e.data;
@@ -322,6 +366,8 @@ function attachWorkerListener(worker) {
         pending.delete(d.id);
         p.resolve(d);
       }
+    } else if (d.type === 'progress') {
+      showProgress('Menjalankan model… ' + d.done + '/' + d.total, 0.38 + 0.55 * (d.done / d.total));
     } else if (d.type === 'error') {
       const all = Array.from(pending.values());
       pending.clear();
@@ -330,13 +376,14 @@ function attachWorkerListener(worker) {
   });
 }
 
-function sendToWorker(payload) {
+function sendToWorker(payload, transfer) {
   const id = ++msgSeq;
   return new Promise((resolve, reject) => {
     pending.set(id, { resolve, reject });
-    state.worker.postMessage(Object.assign({ id }, payload));
+    state.worker.postMessage(Object.assign({ id }, payload), transfer || []);
   });
 }
+
 
 /* ──────────────────────────────────────────────────────────────
    RENDER HASIL
@@ -414,6 +461,8 @@ function renderResult(result, box, sourceCanvas) {
 
   // Overlay anotasi
   drawAnnotated(sourceCanvas, box, result.annotationResults);
+  els.annotImg.src = els.canvas.toDataURL('image/jpeg', 0.9);
+  els.annotImg.hidden = false;
 }
 
 function listBlock(title, items) {
@@ -493,13 +542,14 @@ function drawAnnotated(sourceCanvas, box, annotationResults) {
   // Label kondisi di bawah bounding box — skinsight.py:625+
   ctx.font = '700 13px "DM Sans", sans-serif';
   let offset = 0;
+  let row = 0;
   for (const [name, score] of annotationResults) {
     const rgb = CONDITION_COLOR_RGB[name] || [120, 120, 120];
     const hex = '#' + rgb.map((v) => v.toString(16).padStart(2, '0')).join('');
     const label = cap(name) + ' ' + (score * 100).toFixed(0) + '%';
     const w = ctx.measureText(label).width + 14;
     const bx = f.x + offset;
-    const by = f.y + f.h + 24;
+    const by = f.y + f.h + 24 + row * 26;
 
     ctx.fillStyle = hex;
     ctx.beginPath();

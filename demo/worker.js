@@ -25,6 +25,11 @@
  *   keluar {type:'ready'} | {type:'error', message}
  */
 
+// false = hanya Teachable Machine (ringan, aman di HP)
+// true  = ensemble 0.3·TM + 0.7·EfficientNetB3 (berat)
+const USE_CUSTOM_MODEL = false;
+
+
 let modelMy = null;   // model custom EfficientNetB3
 let modelTm = null;   // model Teachable Machine
 let tf = null;
@@ -184,14 +189,22 @@ async function init() {
   modelTm = await tflite.loadTFLiteModel('models/model_tm_fp16.tflite');
   console.log('[worker] model siap dalam', ((performance.now() - t1) / 1000).toFixed(1), 'dtx');
 
+  if (USE_CUSTOM_MODEL) {
+    modelMy = await tflite.loadTFLiteModel('models/model_efb3_fp16.tflite');
+  }
+  modelTm = await tflite.loadTFLiteModel('models/model_tm_fp16.tflite');
+  console.log('[worker] model siap dalam', ((performance.now() - t1) / 1000).toFixed(1), 'dtx');
+
   try {
-    const inMy = modelMy.inputs[0];
-    const outMy = modelMy.outputs[0];
-    console.log('[worker] modelMy in:', inMy.shape, inMy.dtype, '-> out:', outMy.shape, outMy.dtype);
     console.log('[worker] modelTm in:', modelTm.inputs[0].shape, modelTm.inputs[0].dtype);
   } catch (e) {
     console.warn('[worker] info tensor tidak terbaca:', e && e.message);
   }
+
+  // Pemanasan: inferensi pertama selalu paling lambat, jadi lakukan sekarang.
+  const warm = tf.zeros([1, IMG_SIZE, IMG_SIZE, 3]);
+  (await modelTm.predict(warm)).dispose();
+  warm.dispose();
 
   console.log('[worker] memuat cascade Haar…');
   cascade = await loadCascade();
@@ -496,35 +509,25 @@ async function predictFrame(mat3) {
 */
 
 
-
 async function predictFrame(mat3) {
-  console.log('[TEST] Mulai preprocessing');
-
   const pre = preprocessFace(mat3);
   const { inputMy, inputTm } = buildInputs(pre);
   pre.delete();
 
   const tTm = tf.tensor4d(inputTm, [1, IMG_SIZE, IMG_SIZE, 3]);
+  const outTm = await modelTm.predict(tTm);
+  const predTm = Array.from(await outTm.data());
+  tTm.dispose(); outTm.dispose();
 
-  console.log('[TEST] Input TM:', tTm.shape, tTm.dtype);
-  console.log('[TEST] Menjalankan modelTm...');
+  if (!USE_CUSTOM_MODEL) return predTm;          // hanya Teachable Machine
 
-  try {
-    const outTm = await modelTm.predict(tTm);
+  const tMy = tf.tensor4d(inputMy, [1, IMG_SIZE, IMG_SIZE, 3]);
+  const outMy = await modelMy.predict(tMy);
+  const predMy = Array.from(await outMy.data());
+  tMy.dispose(); outMy.dispose();
 
-    console.log('[TEST] modelTm BERHASIL');
-
-    const predTm = Array.from(await outTm.data());
-
-    console.log('[TEST] Output TM:', predTm);
-
-    outTm.dispose();
-
-    return predTm;
-
-  } finally {
-    tTm.dispose();
-  }
+  // 0.3 * TM + 0.7 * custom — skinsight.py:455
+  return predMy.map((v, i) => 0.3 * predTm[i] + 0.7 * v);
 }
 
 
@@ -583,8 +586,9 @@ self.onmessage = async (e) => {
       const ruleScores = ruleBasedSkinScores(resized[resized.length - 1], CLASS_NAMES_WORKER);
 
       const predictions = [];
-      for (const mat of resized) {
-        predictions.push(await predictFrame(mat));
+      for (let i = 0; i < resized.length; i++) {
+        predictions.push(await predictFrame(resized[i]));
+        self.postMessage({ type: 'progress', id: msg.id, done: i + 1, total: resized.length });
       }
 
       resized.forEach((m) => m.delete());
